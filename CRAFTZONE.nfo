@@ -1,0 +1,126 @@
+
+  ╔══════════════════════════════════════════════════════════════════════════════╗
+  ║                                                                              ║
+  ║  ██████╗██████╗  █████╗ ███████╗████████╗███████╗ ██████╗ ███╗   ██╗███████╗ ║
+  ║ ██╔════╝██╔══██╗██╔══██╗██╔════╝╚══██╔══╝╚═══██ ║██╔═══██╗████╗  ██║██╔════╝ ║
+  ║ ██║     ██████╔╝███████║█████╗     ██║      ██ ╔╝██║   ██║██╔██╗ ██║█████╗   ║
+  ║ ██║     ██╔══██╗██╔══██║██╔══╝     ██║     ██ ╔╝ ██║   ██║██║╚██╗██║██╔══╝   ║
+  ║ ╚██████╗██║  ██║██║  ██║██║        ██║   ███████╗╚██████╔╝██║ ╚████║███████╗ ║
+  ║  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝   ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝ ║
+  ║                                                                              ║
+  ║                   I N V E N T O R Y   M A N A G E M E N T                    ║
+  ║                                 v 2 . 0                                      ║
+  ╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  ABOUT                                                                       │
+  ├──────────────────────────────────────────────────────────────────────────────┤
+  │                                                                              │
+  │  Craftzone is a full-featured, self-hosted inventory management system       │
+  │  built for small and medium businesses. It tracks products from intake       │
+  │  to sale, manages suppliers, users and settings — all from a clean,          │
+  │  responsive web interface that works on desktop and mobile alike.            │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  DEMO                                                                        │
+  ├──────────────────────────────────────────────────────────────────────────────┤
+  │                                                                              │
+  │  Live demo  »  https://demo.craftzone.hu                                     │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  TECH STACK                                                                  │
+  ├──────────────────────────────────────────────────────────────────────────────┤
+  │                                                                              │
+  │  Backend    PHP 8+  ·  PDO / MySQL                                           │
+  │  Frontend   Vanilla HTML5 / CSS3 / JavaScript  (zero dependencies)           │
+  │  Database   MySQL 5.7+  ·  InnoDB with foreign-key constraints               │
+  │  Auth       Session-based  ·  bcrypt password hashing                        │
+  │  Security   CSRF tokens  ·  prepared statements  ·  role-based access        │
+  │                                                                              │
+  │  HOW IT WORKS                                                                │
+  │  ─────────────────────────────────────────────────────────────────────────   │
+  │  Every request goes through a central db.php bootstrap that handles the      │
+  │  PDO singleton and redirects to the installer if config.php is missing.      │
+  │  Pages follow a POST → Redirect → GET pattern to prevent double-submit.      │
+  │  All mutations are guarded by CSRF tokens regenerated on each form load.     │
+  │                                                                              │
+  │  Products receive auto-generated stock numbers (e.g. RAK-0042) with a        │
+  │  configurable prefix. The full audit log records every create/edit/delete    │
+  │  action with the acting user's IP address and timestamp.                     │
+  │                                                                              │
+  │  The UI ships with a light/dark theme toggle. The chosen theme is stored     │
+  │  in localStorage and falls back to the OS prefers-color-scheme setting       │
+  │  on first visit. The entire frontend is responsive down to 320 px wide       │
+  │  with a collapsible hamburger navbar and column-hiding on narrow tables.     │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  FEATURES                                                                    │
+  ├──────────────────────────────────────────────────────────────────────────────┤
+  │                                                                              │
+  │  ›  Product catalogue with stock numbers, supplier, type & specification     │
+  │  ›  Intake / sale tracking with invoice numbers and buyer info               │
+  │  ›  Advanced search with date-range, price-range and keyword highlight       │
+  │  ›  Paginated product list with live AJAX quick-search                       │
+  │  ›  Role-based user management  (admin / user)                               │
+  │  ›  Configurable option lists: product types, specs, suppliers               │
+  │  ›  App-wide settings: name, stock prefix, active fields                     │
+  │  ›  Full audit log with user, action, timestamp and IP                       │
+  │  ›  One-step web installer — no CLI setup required                           │
+  │  ›  Light / dark theme with system-preference detection                      │
+  │  ›  Fully responsive — tested on desktop, tablet and mobile                  │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  INSTALLATION                                                                │
+  ├──────────────────────────────────────────────────────────────────────────────┤
+  │                                                                              │
+  │  1.  Copy all project files to your web server's document root               │
+  │      (e.g. /var/www/html/  or  htdocs/).                                     │
+  │                                                                              │
+  │  2.  Create a MySQL / MariaDB database for the application:                  │
+  │                                                                              │
+  │   CREATE DATABASE sample_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;│
+  │                                                                              │
+  │  3.  Open the installer in your browser:                                     │
+  │                                                                              │
+  │        http://your-server/install.php                                        │
+  │                                                                              │
+  │  4.  Fill in the installer form:                                             │
+  │        ·  Step 1 — database host, name, username, password                   │
+  │        ·  Step 2 — admin account username and password                       │
+  │      The installer creates all tables, seeds the default options, and        │
+  │      writes config/config.php automatically.                                 │
+  │                                                                              │
+  │  5.  DELETE install.php after setup is complete.                             │
+  │      Leaving it accessible allows anyone to reset the application.           │
+  │                                                                              │
+  │  6.  (Optional) Point a virtual host or subdomain at the project folder      │
+  │      so the app is reachable at a clean URL without a subfolder path.        │
+  │                                                                              │
+  │  NOTE  The web server must have write access to the config/ directory        │
+  │        during installation so the installer can create config.php.           │
+  │        After setup that directory can be made read-only again.               │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │  REQUIREMENTS                                                                │
+  ├──────────────────────────────────────────────────────────────────────────────┤
+  │                                                                              │
+  │  PHP   8.0 or higher  (PDO + pdo_mysql extension required)                   │
+  │  MySQL  5.7 / 8.x  or  MariaDB 10.4+                                         │
+  │  Web server:  Apache / Nginx / PHP built-in server                           │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ╔══════════════════════════════════════════════════════════════════════════════╗
+  ║           greets to everyone who keeps their stock in a spreadsheet          ║
+  ╚══════════════════════════════════════════════════════════════════════════════╝
+

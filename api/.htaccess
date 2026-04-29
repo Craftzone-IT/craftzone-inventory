@@ -1,0 +1,33 @@
+# =============================================
+#  API — Rewrite & CORS konfiguráció
+# =============================================
+
+# ── Rewrite engine ────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Ensure the Authorization header is passed through to PHP.
+    # Some Apache + CGI/FastCGI setups strip it; this preserves it.
+    RewriteCond %{HTTP:Authorization} .+
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Front controller: route all requests to api/index.php
+    # unless the target file or directory physically exists.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# ── CORS headers ──────────────────────────────
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+    Header always set Access-Control-Max-Age "86400"
+</IfModule>
+
+# ── OPTIONS preflight — return 204 immediately ─
+<IfModule mod_rewrite.c>
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ - [R=204,L]
+</IfModule>

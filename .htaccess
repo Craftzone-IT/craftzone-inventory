@@ -1,0 +1,46 @@
+# =============================================
+#  Raktárkészlet kezelő – Apache konfiguráció
+# =============================================
+
+# ── Könyvtárlistázás tiltása ─────────────────
+Options -Indexes
+
+# ── Érzékeny fájlok közvetlen elérésének tiltása ──
+<FilesMatch "^(config\.php|\.env)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# ── install.php védelme telepítés után ───────
+# Ha már létezik a config/config.php, az install.php-t
+# érdemes törölni vagy átnevezni. Addig is korlátozható
+# IP-cím alapján (az alábbi sorban cseréld le a saját IP-dre):
+# <Files "install.php">
+#     Require ip 192.168.1.100
+# </Files>
+
+# ── .htaccess fájlok elrejtése ────────────────
+<Files ".htaccess">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
+</Files>
+
+# ── Biztonsági fejlécek ───────────────────────
+<IfModule mod_headers.c>
+    # Clickjacking elleni védelem
+    Header always set X-Frame-Options "SAMEORIGIN"
+    # XSS szűrő (régebbi böngészőknek)
+    Header always set X-XSS-Protection "1; mode=block"
+    # MIME-type sniffing tiltása
+    Header always set X-Content-Type-Options "nosniff"
+    # Referrer korlátozása
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

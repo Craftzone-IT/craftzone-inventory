@@ -1,0 +1,34 @@
+# Configuration files (érzékeny adatok)
+/config/config.php
+
+# Composer
+/vendor/
+composer.phar
+
+# IDE & editor
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Claude Code
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+/logs/
+
+# Cache & temp
+/cache/
+/tmp/
+*.cache
+
+# Backup files
+*.bak
+*.swp
+*~

@@ -1,0 +1,1006 @@
+/* =============================================
+   Inventory Manager v2 – Main Stylesheet
+   All colours are defined as CSS custom properties in :root so dark-mode
+   overrides only need to reassign those variables, not repeat every rule.
+   ============================================= */
+
+/* Universal box-sizing reset — prevents padding from inflating element widths. */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Design tokens ──────────────────────────
+   All colours, shadows, and the common border-radius live here.
+   Components reference these variables so the whole palette can be
+   swapped at once by dark-mode rules at the bottom of this file.
+   ─────────────────────────────────────────── */
+:root {
+    --bg:        #f0f2f5;
+    --surface:   #ffffff;
+    --border:    #e2e8f0;
+    --text:      #1a202c;
+    --text-muted:#718096;
+    --primary:   #3b82f6;
+    --primary-h: #2563eb;   /* primary hover — slightly darker */
+    --danger:    #ef4444;
+    --success:   #22c55e;
+    --warning:   #f59e0b;
+    --orange:    #f97316;
+    --nav-bg:    #1e293b;
+    --nav-text:  #cbd5e1;
+    --radius:    8px;
+    --shadow:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ── Navbar ─────────────────────────────────
+   Sticky top bar that holds the brand logo, navigation links, user info,
+   and the theme-toggle button. Stays above all content via z-index: 100.
+   ─────────────────────────────────────────── */
+.navbar {
+    background: var(--nav-bg);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    gap: 8px;
+}
+
+.navbar-brand {
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    /* flex-shrink: 0 prevents the brand from being squeezed by the nav links */
+    flex-shrink: 0;
+}
+
+.brand-icon { color: #60a5fa; font-size: 16px; }
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2px;
+    flex: 1;
+    /* overflow: hidden clips links that do not fit rather than wrapping */
+    overflow: hidden;
+}
+
+.nav-links a {
+    color: var(--nav-text);
+    text-decoration: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: background .15s, color .15s;
+    white-space: nowrap;
+    display: block;
+}
+
+.nav-links a:hover  { background: rgba(255,255,255,.08); color: #fff; }
+/* .active is set by header.php based on the current page filename */
+.nav-links a.active { background: var(--primary); color: #fff; }
+/* Items only shown in the mobile dropdown (user name, profile link, logout) */
+.nav-mobile-only    { display: none; }
+/* Logout link uses a reddish tint to signal a destructive action */
+.nav-logout         { color: #fca5a5 !important; }
+
+/* ── Hamburger button ───────────────────────
+   Hidden on desktop; shown on mobile (≤767px) via the media query below.
+   The three <span> bars animate into an × when the .is-open class is added
+   by the JavaScript toggle in header.php.
+   ─────────────────────────────────────────── */
+.navbar-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 6px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.navbar-hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #cbd5e1;
+    border-radius: 2px;
+    transition: transform .22s ease, opacity .22s ease;
+}
+/* When open: top bar rotates +45°, middle bar fades out, bottom bar rotates −45°.
+   The 7px translateY matches the gap between bars so the diagonals cross at centre. */
+.navbar-hamburger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.navbar-hamburger.is-open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.navbar-hamburger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.user-name {
+    color: var(--nav-text);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-user-action {
+    color: var(--nav-text);
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    transition: background .15s;
+}
+
+.btn-user-action:hover { background: rgba(255,255,255,.1); color: #fff; }
+/* Logout button uses a danger-tinted hover to distinguish it from regular actions */
+.btn-logout { color: #fca5a5 !important; }
+.btn-logout:hover { background: rgba(239,68,68,.2) !important; }
+
+/* Small pill badge next to the user's name indicating their role (Admin / User) */
+.role-badge {
+    background: #3b82f6;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+/* ── Container ──────────────────────────────
+   Centres content on wide screens and provides consistent horizontal padding.
+   1440px max-width accommodates the wide product table without requiring
+   horizontal scrolling on typical desktop monitors.
+   ─────────────────────────────────────────── */
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 22px 20px 48px;
+}
+
+/* ── Page header ────────────────────────────
+   Flex row: title on the left, action buttons (e.g. "New item") on the right.
+   flex-wrap allows the buttons to drop to a second line on narrow screens.
+   ─────────────────────────────────────────── */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.page-header h1 { font-size: 20px; font-weight: 700; }
+.page-subtitle   { color: var(--text-muted); font-size: 13px; }
+
+/* ── Stats grid ─────────────────────────────
+   Auto-fit columns with a 180px minimum so the grid fills the available width
+   and automatically wraps to fewer columns on smaller screens without a media
+   query — each stat card maintains a readable minimum width.
+   ─────────────────────────────────────────── */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.stat-icon {
+    width: 44px; height: 44px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    /* flex-shrink: 0 prevents the icon from collapsing when the value text is long */
+    flex-shrink: 0;
+}
+
+/* Colour variants for stat icons — light tinted backgrounds with matching text */
+.stat-icon.blue   { background: #dbeafe; color: #2563eb; }
+.stat-icon.red    { background: #fee2e2; color: #dc2626; }
+.stat-icon.green  { background: #dcfce7; color: #16a34a; }
+.stat-icon.orange { background: #ffedd5; color: #ea580c; }
+
+.stat-value { font-size: 22px; font-weight: 700; line-height: 1.2; }
+.stat-label { color: var(--text-muted); font-size: 11px; }
+
+/* ── Two-column layouts ─────────────────────
+   .two-col          — equal 50/50 split (used in beallitasok.php for type/spec)
+   .two-col-form     — asymmetric split: main form + narrow sidebar (380px)
+   Both collapse to a single column below 1000px via the media query below.
+   ─────────────────────────────────────────── */
+.two-col, .two-col-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: start;
+}
+
+/* The product form sidebar (change history) has a fixed 380px width */
+.two-col-form { grid-template-columns: 1fr 380px; }
+
+@media (max-width: 1000px) {
+    .two-col, .two-col-form { grid-template-columns: 1fr; }
+}
+
+/* ── Card ───────────────────────────────────
+   Surface container with rounded corners and a subtle shadow.
+   overflow: hidden clips child elements (e.g. table rows) to the card border-radius.
+   ─────────────────────────────────────────── */
+.card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+/* .card-table overrides overflow to visible so that absolutely-positioned
+   elements inside the table (e.g. dropdown menus) are not clipped by the card. */
+.card-table { overflow: visible; }
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-header h2 { font-size: 14px; font-weight: 600; }
+
+/* ── Table ──────────────────────────────────
+   Full-width collapsed-border table used throughout the application.
+   th uses uppercase small-caps style to visually distinguish headers from data.
+   ─────────────────────────────────────────── */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--text-muted);
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+/* Compact variant for the product list table which has many columns.
+   Reduced padding and slightly smaller font fit more data without scrolling. */
+.table-compact th { padding: 7px 7px; font-size: 10px; }
+.table-compact td { padding: 6px 7px; font-size: 12px; }
+
+/* Remove the bottom border from the last row to avoid a double-border effect
+   at the bottom of the table when it sits inside a card with overflow: hidden. */
+.table tbody tr:last-child td { border-bottom: none; }
+.table-hover tbody tr:hover   { background: #f8fafc; }
+
+/* Row colouring: sold items get a subtle green tint; inactive users are dimmed */
+.row-sold     { background: #f0fdf4; }
+.row-inactive { background: #f8fafc; opacity: .7; }
+
+/* Row count / result limit notice displayed below the table */
+.table-count {
+    padding: 9px 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+}
+
+/* ── Badges ─────────────────────────────────
+   Pill-shaped status labels used for stock status, roles, boolean flags, etc.
+   border-radius: 999px creates a fully rounded pill regardless of content width.
+   ─────────────────────────────────────────── */
+.badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-green  { background: #dcfce7; color: #15803d; }
+.badge-red    { background: #fee2e2; color: #dc2626; }
+.badge-orange { background: #ffedd5; color: #c2410c; }
+.badge-blue   { background: #dbeafe; color: #1d4ed8; }
+.badge-gray   { background: #f1f5f9; color: #475569; }
+
+/* ── Buttons ────────────────────────────────
+   Base .btn provides shared layout (inline-flex for icon+label alignment).
+   Colour variants are applied with modifier classes (btn-primary, btn-danger…).
+   .btn:active nudges the button down by 1px for a satisfying press effect.
+   ─────────────────────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: background .15s, transform .05s;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn-primary   { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-h); }
+/* Secondary uses a neutral grey — used for non-destructive secondary actions */
+.btn-secondary { background: #e2e8f0; color: var(--text); }
+.btn-secondary:hover { background: #cbd5e1; }
+/* Danger uses a red-tinted background rather than solid red to stay readable */
+.btn-danger    { background: #fee2e2; color: var(--danger); }
+.btn-danger:hover { background: #fecaca; }
+/* Ghost has no background — used for cancel / back links to reduce visual weight */
+.btn-ghost     { background: transparent; color: var(--text-muted); }
+.btn-ghost:hover { background: var(--border); }
+
+/* Small button variant for inline table actions (edit, delete per-row) */
+.btn-sm { padding: 4px 9px; font-size: 12px; }
+
+/* ── Form elements ──────────────────────────
+   All form controls share the .input class so their visual style is consistent
+   (same padding, border, focus ring) regardless of element type: <input>,
+   <select>, <textarea>.
+   ─────────────────────────────────────────── */
+.filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    align-items: center;
+}
+
+.input {
+    padding: 7px 11px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    width: 100%;
+    transition: border-color .15s;
+    font-family: inherit;
+}
+
+/* Focus ring uses a translucent blue shadow instead of the browser default outline
+   so it respects dark mode and blends with the primary colour */
+.input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+/* Read-only fields (e.g. auto-generated stock number) are visually dimmed */
+.input-readonly { background: #f8fafc; color: var(--text-muted); cursor: default; }
+textarea.input  { resize: vertical; }
+
+.form-card { padding: 20px; }
+
+/* Form grid layouts — 2-column default, 3-column variant for wider forms.
+   Breakpoint collapse is handled by the 700px media query below. */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+/* Span helpers let individual fields occupy more columns (e.g. a wide name field) */
+.form-span-2   { grid-column: span 2; }
+.form-span-full{ grid-column: 1 / -1; }
+
+/* Collapse all form grids to a single column on small screens */
+@media (max-width: 700px) {
+    .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+    .form-span-2, .form-span-full { grid-column: 1; }
+}
+
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 12px; font-weight: 600; color: #374151; }
+/* Hint text shown below an input to clarify expected format or side-effects */
+.form-hint        { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+/* Section dividers within long forms (Identification / Product / Sale sections) */
+.form-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    margin: 20px 0 12px;
+}
+
+/* Remove top margin for the very first section title so it sits flush at top */
+.form-section-title:first-child { margin-top: 0; }
+
+.form-actions { display: flex; gap: 8px; margin-top: 20px; align-items: center; flex-wrap: wrap; }
+
+/* ── Checkboxes ─────────────────────────────
+   Custom checkbox row with accent-color to match the primary theme colour.
+   user-select: none prevents the label text from being accidentally selected
+   when the user clicks quickly.
+   ─────────────────────────────────────────── */
+.checkbox-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 8px 0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    user-select: none;
+}
+
+.checkbox-label input[type=checkbox] {
+    width: 15px;
+    height: 15px;
+    /* accent-color tints the native checkbox to match the brand colour */
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+/* Radio buttons follow the same layout pattern as checkboxes */
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* Inline add form (used in beallitasok.php below option tables) */
+.inline-add-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 12px 0 4px;
+}
+
+/* ── Flash messages ─────────────────────────
+   Temporary feedback banners shown after a POST → Redirect → GET cycle.
+   The opacity transition is used by JavaScript in footer.php to auto-dismiss
+   success messages after a few seconds.
+   ─────────────────────────────────────────── */
+.flash {
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: opacity .5s;
+}
+
+.flash-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.flash-error   { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+
+/* ── Misc utilities ─────────────────────────── */
+/* Centered placeholder shown when a table has no rows to display */
+.empty-state {
+    padding: 28px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.text-muted { color: var(--text-muted); }
+/* Prevents action button groups in table cells from wrapping mid-row */
+.actions    { white-space: nowrap; }
+
+/* Inline code snippet styling — used for stock numbers (e.g. RAK-0001) */
+code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: monospace;
+}
+
+/* Search hit highlight — applied by kereses.php with preg_replace around matched text */
+mark {
+    background: #fef08a;
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+}
+
+/* ── Filter bar extras ──────────────────────
+   Visual separator (thin vertical rule) between filter groups in the bar.
+   Hidden on mobile to save space.
+   ─────────────────────────────────────────── */
+.filter-sep {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+
+/* Label text preceding a filter control (e.g. "Sort by:") */
+.filter-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* ── Pagination ─────────────────────────────
+   Pagination bar sits at the bottom of the product table card.
+   Left side: result count. Right side: page buttons + jump-to input.
+   flex-wrap allows the layout to reflow gracefully on small screens.
+   ─────────────────────────────────────────── */
+.pagination-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    background: #fafafa;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-wrap: wrap;
+}
+
+/* Individual page number buttons */
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 7px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .12s, border-color .12s, color .12s;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.page-btn:hover    { background: #f1f5f9; border-color: #cbd5e1; }
+/* !important overrides ensure the active page remains visually distinct even
+   when combined with hover or other state selectors */
+.page-btn-active   { background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; font-weight: 700; }
+/* Ellipsis between page ranges — not interactive, just visual */
+.page-ellipsis     { color: var(--text-muted); padding: 0 3px; font-size: 13px; line-height: 30px; user-select: none; }
+
+/* "Go to page" quick-jump field */
+.page-jump {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 4px;
+}
+
+/* Narrow number input for the page jump field; !important overrides .input defaults */
+.page-jump-input {
+    width: 52px !important;
+    height: 30px !important;
+    padding: 0 6px !important;
+    text-align: center;
+    font-size: 12px;
+}
+
+/* ── Footer ─────────────────────────────────── */
+.footer {
+    text-align: center;
+    padding: 16px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* ── Custom scrollbar ───────────────────────
+   Thin 5×5 px scrollbar for WebKit browsers (Chrome, Edge, Safari).
+   Firefox uses the standard scrollbar; this is purely cosmetic.
+   ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+/* =============================================
+   TABLET  (≤ 1024px)
+   At this breakpoint the form sidebar is dropped to full width and several
+   less-important product table columns are hidden to prevent overflow.
+   ============================================= */
+@media (max-width: 1024px) {
+    .container { padding: 16px 16px 40px; }
+    /* Stats wrap to 2 columns instead of 4 */
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    /* Product form sidebar drops below the main form */
+    .two-col-form { grid-template-columns: 1fr; }
+
+    /* Hide lower-priority columns on the product table to fit the viewport.
+       Hidden columns (by position): incoming invoice# (3), outgoing invoice# (11),
+       archived (12), checked (13), inventory (14), added-by (15). */
+    .table-compact th:nth-child(3),  .table-compact td:nth-child(3),
+    .table-compact th:nth-child(11), .table-compact td:nth-child(11),
+    .table-compact th:nth-child(12), .table-compact td:nth-child(12),
+    .table-compact th:nth-child(13), .table-compact td:nth-child(13),
+    .table-compact th:nth-child(14), .table-compact td:nth-child(14),
+    .table-compact th:nth-child(15), .table-compact td:nth-child(15) { display: none; }
+}
+
+/* =============================================
+   MOBILE  (≤ 767px)
+   Full mobile layout: hamburger nav, single-column forms, heavily pruned
+   product table (only stock number, name, buyer, and action columns remain).
+   ============================================= */
+@media (max-width: 767px) {
+
+    /* ── Navbar ── */
+    .navbar {
+        /* Allow nav links to drop below the main bar row */
+        flex-wrap: wrap;
+        height: auto;
+        padding: 0 14px;
+        /* relative positioning so the dropdown can be absolutely positioned below */
+        position: relative;
+    }
+    .navbar-brand  { height: 52px; flex: 1; }
+    /* Hide the text part of the brand, keep only the icon to save space */
+    .brand-text    { display: none; }
+    /* Show the hamburger button on mobile */
+    .navbar-hamburger { display: flex; }
+    /* Desktop user info bar (name + profile/logout buttons) is hidden; those
+       links are instead injected into the mobile dropdown via .nav-mobile-only */
+    .navbar-user   { display: none; }
+
+    /* Mobile nav dropdown — hidden by default, revealed by adding .nav-open
+       class via JavaScript when the hamburger button is clicked */
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        gap: 0;
+        overflow: visible;
+        background: #0f172a;
+        border-top: 1px solid rgba(255,255,255,.08);
+        padding: 6px 0 10px;
+        /* Positioned absolutely so it overlays content below the navbar */
+        position: absolute;
+        top: 52px;
+        left: 0; right: 0;
+        z-index: 200;
+        box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+    .nav-links.nav-open { display: flex; }
+    .nav-links li  { width: 100%; }
+    /* Full-width tap targets with more vertical padding for easier touch use */
+    .nav-links a   { padding: 11px 20px; border-radius: 0; font-size: 14px; }
+    .nav-links a:hover { background: rgba(255,255,255,.06); }
+    /* Mobile-only items (profile, logout) become visible inside the dropdown */
+    .nav-mobile-only { display: block; }
+    .nav-mobile-only a { border-top: 1px solid rgba(255,255,255,.06); margin-top: 4px; padding-top: 12px; }
+
+    /* ── Container ── */
+    .container { padding: 12px 10px 32px; }
+
+    /* ── Page header ── */
+    .page-header h1 { font-size: 17px; }
+    .page-header    { flex-wrap: wrap; gap: 8px; }
+
+    /* ── Stats ── */
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-card  { padding: 12px 14px; gap: 10px; }
+    .stat-value { font-size: 20px; }
+    .stat-icon  { width: 38px; height: 38px; font-size: 17px; }
+
+    /* ── Two-column layouts ── */
+    .two-col, .two-col-form { grid-template-columns: 1fr; }
+
+    /* ── Filter bar ── */
+    /* Stack all filter controls vertically for easier thumb reach */
+    .filter-bar { flex-direction: column; align-items: stretch; gap: 6px; }
+    .filter-bar select.input,
+    .filter-bar .input  { width: 100% !important; }
+    /* Hide the decorative separator and label text to reduce clutter */
+    .filter-bar .filter-sep   { display: none; }
+    .filter-bar .filter-label { display: none; }
+    /* "Advanced search" link normally floats right via margin-left: auto;
+       reset to 0 so it aligns with the rest of the stacked controls */
+    .filter-bar a.btn-ghost   { margin-left: 0 !important; }
+    /* Search and clear buttons align to the left edge */
+    .filter-bar button[type=submit],
+    .filter-bar a.btn-ghost { align-self: flex-start; }
+
+    /* ── Product table on mobile: show only essential columns ──
+       Visible: col 1 (stock number), col 5 (name), col 9 (buyer), col 16 (actions).
+       All other columns (date, invoice numbers, price, type, spec, flags, added-by)
+       are hidden to avoid a horizontal scroll on a narrow screen. */
+    .table-compact th:nth-child(2),  .table-compact td:nth-child(2),
+    .table-compact th:nth-child(3),  .table-compact td:nth-child(3),
+    .table-compact th:nth-child(4),  .table-compact td:nth-child(4),
+    .table-compact th:nth-child(6),  .table-compact td:nth-child(6),
+    .table-compact th:nth-child(7),  .table-compact td:nth-child(7),
+    .table-compact th:nth-child(8),  .table-compact td:nth-child(8),
+    .table-compact th:nth-child(10), .table-compact td:nth-child(10),
+    .table-compact th:nth-child(11), .table-compact td:nth-child(11),
+    .table-compact th:nth-child(12), .table-compact td:nth-child(12),
+    .table-compact th:nth-child(13), .table-compact td:nth-child(13),
+    .table-compact th:nth-child(14), .table-compact td:nth-child(14),
+    .table-compact th:nth-child(15), .table-compact td:nth-child(15) { display: none; }
+
+    /* Stack action buttons vertically to prevent overflow in the narrow actions column */
+    .actions { display: flex; flex-direction: column; gap: 3px; }
+    .actions .btn-sm { font-size: 11px; padding: 3px 7px; }
+
+    /* ── Pagination on mobile ── */
+    /* Stack count and page buttons vertically */
+    .pagination-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+    .pagination { gap: 2px; }
+    /* Slightly smaller page buttons to fit more in a row on narrow screens */
+    .page-btn   { min-width: 28px; height: 28px; font-size: 12px; padding: 0 5px; }
+    .page-jump  { margin-left: 0; }
+    .page-jump-input { width: 46px !important; }
+
+    /* ── Cards ── */
+    .card      { border-radius: 6px; }
+    .form-card { padding: 14px; }
+
+    /* ── Forms ── */
+    /* Force all form grids to single column; !important overrides inline styles */
+    .form-grid,
+    .form-grid-3        { grid-template-columns: 1fr !important; }
+    .form-span-2,
+    .form-span-full     { grid-column: 1 !important; }
+    .form-section-title { margin-top: 14px; }
+    .form-actions       { flex-wrap: wrap; }
+
+    /* ── Checkbox row ── */
+    /* Stack checkboxes vertically so each has a full-width tap area */
+    .checkbox-row { flex-direction: column; gap: 10px; }
+
+    /* ── Buttons ── */
+    .btn { font-size: 12px; padding: 6px 12px; }
+
+    /* ── Tables ── */
+    .table th { padding: 7px 8px; font-size: 10px; }
+    .table td { padding: 7px 8px; font-size: 12px; }
+
+    /* ── Flash messages ── */
+    .flash { font-size: 12px; padding: 9px 12px; }
+
+    /* Audit log and search result tables use horizontal scroll on mobile
+       instead of column-hiding, because their schema is variable and they
+       are accessed less frequently than the main product list. */
+    .card-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+/* =============================================
+   DARK MODE  – html[data-theme="dark"]
+
+   The theme attribute is set on the <html> element by JavaScript in header.php.
+   The JS reads the user's saved preference from localStorage first, then falls
+   back to the OS-level prefers-color-scheme media query if no preference is saved.
+   Changing the attribute here (rather than using a body class) ensures dark mode
+   works even for elements rendered before <body> (e.g. scrollbars).
+   ============================================= */
+
+/* Theme toggle button in the navbar (sun/moon icon) */
+.theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--nav-text);
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: background .15s, color .15s;
+    flex-shrink: 0;
+}
+.theme-toggle:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+/* Reassign only the CSS variables — all component rules that reference them
+   automatically adapt without needing separate dark-mode rule sets. */
+html[data-theme="dark"] {
+    --bg:        #0f172a;
+    --surface:   #1e293b;
+    --border:    #334155;
+    --text:      #e2e8f0;
+    --text-muted:#94a3b8;
+    --nav-bg:    #0c1528;
+    --nav-text:  #94a3b8;
+    --shadow:    0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.3);
+}
+
+/* Darker scrollbar thumb for better contrast on dark backgrounds */
+html[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #475569; }
+
+html[data-theme="dark"] .nav-links a:hover { background: rgba(255,255,255,.06); }
+
+/* Table header and hover rows need explicit overrides because they use
+   hardcoded light colours that the CSS variable swap does not reach */
+html[data-theme="dark"] .table th                   { background: #162032; }
+html[data-theme="dark"] .table-hover tbody tr:hover  { background: #243044; }
+html[data-theme="dark"] .row-sold                   { background: #0d2318; }
+html[data-theme="dark"] .row-inactive               { background: #1a2535; opacity: .65; }
+
+html[data-theme="dark"] .pagination-bar  { background: #172030; }
+html[data-theme="dark"] .page-btn:hover  { background: #2d3f55; border-color: #475569; }
+
+/* Badge dark variants invert the background/foreground relationship:
+   dark background + lighter text instead of light background + dark text */
+html[data-theme="dark"] .badge-green  { background: #052e16; color: #4ade80; }
+html[data-theme="dark"] .badge-red    { background: #3b0a0a; color: #f87171; }
+html[data-theme="dark"] .badge-orange { background: #3b1a06; color: #fb923c; }
+html[data-theme="dark"] .badge-blue   { background: #0c1f45; color: #60a5fa; }
+html[data-theme="dark"] .badge-gray   { background: #1e293b; color: #94a3b8; }
+
+/* Stat icon colour variants (same inversion approach as badges) */
+html[data-theme="dark"] .stat-icon.blue   { background: #0c1f45; color: #60a5fa; }
+html[data-theme="dark"] .stat-icon.red    { background: #3b0a0a; color: #f87171; }
+html[data-theme="dark"] .stat-icon.green  { background: #052e16; color: #4ade80; }
+html[data-theme="dark"] .stat-icon.orange { background: #3b1a06; color: #fb923c; }
+
+html[data-theme="dark"] .btn-secondary       { background: #2d3f55; color: var(--text); }
+html[data-theme="dark"] .btn-secondary:hover { background: #3d526b; }
+html[data-theme="dark"] .btn-danger          { background: #3b0a0a; color: #f87171; }
+html[data-theme="dark"] .btn-danger:hover    { background: #4f1111; }
+html[data-theme="dark"] .btn-ghost:hover     { background: #243044; }
+
+html[data-theme="dark"] .form-group label { color: #cbd5e1; }
+html[data-theme="dark"] .input-readonly   { background: #162032; color: var(--text-muted); }
+/* Slightly stronger focus shadow so it remains visible on dark surfaces */
+html[data-theme="dark"] .input:focus      { box-shadow: 0 0 0 3px rgba(59,130,246,.25); }
+
+html[data-theme="dark"] .flash-success { background: #052e16; color: #4ade80; border-color: #14532d; }
+html[data-theme="dark"] .flash-error   { background: #3b0a0a; color: #f87171; border-color: #7f1d1d; }
+
+/* Code and mark elements need explicit dark overrides to remain readable */
+html[data-theme="dark"] code { background: #162032; color: #93c5fd; }
+html[data-theme="dark"] mark { background: #422006; color: #fde68a; }
+
+/* Login page boxes use hardcoded surface colours that need dark-mode overrides */
+/* ── Combobox (searchable dropdown with free text) ─── */
+.combobox { position: relative; }
+.combobox-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.combobox-icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 13px; pointer-events: none;
+    line-height: 1;
+}
+.combobox-icon svg { width: 14px; height: 14px; display: block; }
+.combobox-input {
+    padding-left: 32px !important;
+    cursor: text;
+}
+.combobox-clear {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 16px; line-height: 1;
+    padding: 2px 4px; border-radius: 3px; display: none;
+}
+.combobox-clear:hover { color: var(--danger); background: rgba(239,68,68,.08); }
+.combobox.has-value .combobox-clear { display: block; }
+.combobox-dropdown {
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    max-height: 220px; overflow-y: auto;
+    z-index: 50; display: none;
+}
+.combobox.open .combobox-dropdown { display: block; }
+.combobox-item {
+    padding: 8px 12px; cursor: pointer;
+    font-size: 13px; color: var(--text);
+    transition: background .1s;
+}
+.combobox-item:hover,
+.combobox-item.highlighted { background: rgba(59,130,246,.08); }
+.combobox-item.selected { font-weight: 600; color: var(--primary); }
+.combobox-item mark { background: #fef08a; color: inherit; border-radius: 2px; }
+.combobox-empty {
+    padding: 10px 12px; font-size: 12px; color: var(--text-muted);
+    font-style: italic;
+}
+.combobox-new {
+    padding: 8px 12px; cursor: pointer; font-size: 13px;
+    color: var(--primary); border-top: 1px solid var(--border);
+    transition: background .1s;
+}
+.combobox-new:hover { background: rgba(59,130,246,.08); }
+.combobox-new strong { font-weight: 600; }
+
+/* Dark mode overrides for combobox */
+html[data-theme="dark"] .combobox-dropdown { background: #1e293b; border-color: #334155; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+html[data-theme="dark"] .combobox-item:hover,
+html[data-theme="dark"] .combobox-item.highlighted { background: rgba(59,130,246,.15); }
+html[data-theme="dark"] .combobox-item mark { background: #422006; color: #fde68a; }
+html[data-theme="dark"] .combobox-new { border-top-color: #334155; }
+
+html[data-theme="dark"] .login-box    { background: #1e293b; box-shadow: 0 4px 24px rgba(0,0,0,.4); }
+html[data-theme="dark"] .login-header { background: #0c1528; }
+
+/* Mobile nav dropdown in dark mode — even darker than the regular dark surface */
+@media (max-width: 767px) {
+    html[data-theme="dark"] .nav-links {
+        background: #080f1e;
+        border-top-color: rgba(255,255,255,.06);
+    }
+    html[data-theme="dark"] .nav-links a:hover { background: rgba(255,255,255,.04); }
+}
