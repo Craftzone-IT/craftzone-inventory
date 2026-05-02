@@ -25,7 +25,7 @@
 
 A **Craftzone Inventory** egy teljes funkcionalitású, önállóan hosztolható raktárkészlet-kezelő rendszer kis- és középvállalkozásoknak. A termékeket beérkezéstől eladásig követi nyomon, kezeli a beszállítókat, felhasználókat és alkalmazásbeállításokat — mindezt egy letisztult, reszponzív webes felületen, amely asztali és mobil eszközökön egyaránt jól működik.
 
-> 💡 Ízelítőül a projekt scene-style bemutatkozásáért nézd meg a [CRAFTZONE.nfo](CRAFTZONE.nfo) fájlt!
+
 
 ---
 
